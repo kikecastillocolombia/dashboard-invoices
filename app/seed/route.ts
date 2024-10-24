@@ -34,15 +34,16 @@ async function seedTables() {
     CREATE TABLE IF NOT EXISTS tables (
       id VARCHAR(255) PRIMARY KEY,
       number INT NOT NULL,
-      seats INT NOT NULL
+      seats INT NOT NULL,
+      status VARCHAR(20) NOT NULL CHECK (status IN ('Disponible', 'Ocupada', 'Reservada'))  
     );
   `;
 
   const insertedTables = await Promise.all(
     tables.map(
       (table) => client.sql`
-        INSERT INTO tables (id, number, seats)
-        VALUES (${table.id}, ${table.number}, ${table.seats})
+        INSERT INTO tables (id, number, seats, status)  
+        VALUES (${table.id}, ${table.number}, ${table.seats}, ${table.status}) 
         ON CONFLICT (id) DO NOTHING;
       `
     )
@@ -50,6 +51,7 @@ async function seedTables() {
 
   return insertedTables;
 }
+
 
 async function seedProducts() {
   await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;

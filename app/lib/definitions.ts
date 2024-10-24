@@ -6,9 +6,15 @@ export type User = {
 };
 
 export type Table = {
-  id: string;
-  number: number;
-  seats: number;
+  id: string;         // Identificador único para la mesa
+  number: number;     // Número de la mesa (ejemplo: Mesa 1, Mesa 2)
+  seats: number;      // Número de asientos en la mesa
+  status: 'Disponible' | 'Ocupada' | 'Reservada'; // Estado actual de la mesa
+};
+
+export type TableStatus = {
+  label: string;
+  count: number;
 };
 
 export type Product = {

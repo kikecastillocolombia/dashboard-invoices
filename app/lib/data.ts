@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { QueryResultRow, sql } from '@vercel/postgres';
 import { User, Table, Product, Order, Account } from './definitions';
 
 export async function fetchCardData() {
@@ -56,6 +56,37 @@ export async function fetchCardData() {
     throw error;
   }
 }
+
+export async function fetchCardDataTable() {
+  try {
+    // Consulta SQL para obtener los datos de las mesas
+    const tableDataResult = await sql`
+      SELECT id, number, seats, status FROM tables
+    `;
+
+    // Accedemos a `rows` para obtener los datos y mapearlos al tipo `Table`
+    const tables: Table[] = tableDataResult.rows.map((row: QueryResultRow) => ({
+      id: row.id,
+      number: row.number,
+      seats: row.seats,
+      status: row.status,
+    }));
+
+    // Retornamos el total de mesas y los datos de las mesas
+    return {
+      totalTables: tables.length,
+      tables, // Devuelve los datos de las mesas
+    };
+  } catch (error) {
+    console.error("Error fetching table data:", error);
+    throw error;
+  }
+}
+
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-import { Account, Order, Product, User } from "./definitions";
+import { Account, Order, Product, User, Table } from "./definitions";
 
 const users: User[] = [
   {
@@ -27,13 +27,14 @@ const users: User[] = [
   },
 ];
 
-const tables = [
-  { id: 'table-1', number: 1, seats: 4 },
-  { id: 'table-2', number: 2, seats: 2 },
-  { id: 'table-3', number: 3, seats: 6 },
-  { id: 'table-4', number: 4, seats: 4 },
-  { id: 'table-5', number: 5, seats: 2 },
+const tables: Table[] = [
+  { id: 'table-1', number: 1, seats: 4, status: 'Disponible' },
+  { id: 'table-2', number: 2, seats: 2, status: 'Ocupada' },
+  { id: 'table-3', number: 3, seats: 6, status: 'Reservada' },
+  { id: 'table-4', number: 4, seats: 4, status: 'Disponible' },
+  { id: 'table-5', number: 5, seats: 2, status: 'Ocupada' },
 ];
+
 
 const products: Product[] = [
   {
