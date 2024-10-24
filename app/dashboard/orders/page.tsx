@@ -2,12 +2,12 @@ import React from 'react'
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Dashboard/Customers',
+  title: 'Dashboard/Orders',
 };
 function page() {
   return (
     <div>
-      customers
+      Orders
     </div>
   )
 }

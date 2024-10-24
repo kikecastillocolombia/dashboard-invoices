@@ -1,147 +1,112 @@
-// This file contains placeholder data that you'll be replacing with real data in the Data Fetching chapter:
-// https://nextjs.org/learn/dashboard-app/fetching-data
-const users = [
+import { Account, Order, Product, User } from "./definitions";
+
+const users: User[] = [
   {
-    id: '410544b2-4001-4271-9855-fec4b6a6442a',
-    name: 'User',
-    email: 'user@nextmail.com',
-    password: '123456',
+    id: 'e7f261b1-44f7-4f38-8b43-f0c9cbe2d1d1',
+    name: 'Julian Perez',
+    password: 'password123',
+    role: 'mesero',
+  },
+  {
+    id: '4b4eb74d-1214-4f5b-89c3-fc84b80cd9a1',
+    name: 'Maria Lopez',
+    password: 'password123',
+    role: 'administrador',
+  },
+  {
+    id: 'cb8b92d4-65ed-4821-b52c-1bc9f6c476c4',
+    name: 'Carlos Fernandez',
+    password: 'password123',
+    role: 'cocinero',
+  },
+  {
+    id: '9b7b2372-0915-48c5-b7a7-e2f0331f6f45',
+    name: 'Ana Garcia',
+    password: 'password123',
+    role: 'cajero',
   },
 ];
 
-const customers = [
+const tables = [
+  { id: 'table-1', number: 1, seats: 4 },
+  { id: 'table-2', number: 2, seats: 2 },
+  { id: 'table-3', number: 3, seats: 6 },
+  { id: 'table-4', number: 4, seats: 4 },
+  { id: 'table-5', number: 5, seats: 2 },
+];
+
+const products: Product[] = [
   {
-    id: 'd6e15727-9fe1-4961-8c5b-ea44a9bd81aa',
-    name: 'Evil Rabbit',
-    email: 'evil@rabbit.com',
-    image_url: '/customers/evil-rabbit.png',
+    id: 'prod-1',
+    name: 'Pizza Margherita',
+    description: 'Pizza clásica con salsa de tomate y queso mozzarella.',
+    price: 12,
+    image_url: '/products/pizza-margherita.png',
   },
   {
-    id: '3958dc9e-712f-4377-85e9-fec4b6a6442a',
-    name: 'Delba de Oliveira',
-    email: 'delba@oliveira.com',
-    image_url: '/customers/delba-de-oliveira.png',
+    id: 'prod-2',
+    name: 'Ensalada César',
+    description: 'Lechuga romana fresca con aderezo César, crutones y parmesano.',
+    price: 8,
+    image_url: '/products/caesar-salad.png',
   },
   {
-    id: '3958dc9e-742f-4377-85e9-fec4b6a6442a',
-    name: 'Lee Robinson',
-    email: 'lee@robinson.com',
-    image_url: '/customers/lee-robinson.png',
+    id: 'prod-3',
+    name: 'Espagueti a la Carbonara',
+    description: 'Espagueti con salsa cremosa hecha de huevos, queso y panceta.',
+    price: 15,
+    image_url: '/products/spaghetti-carbonara.png',
   },
   {
-    id: '76d65c26-f784-44a2-ac19-586678f7c2f2',
-    name: 'Michael Novotny',
-    email: 'michael@novotny.com',
-    image_url: '/customers/michael-novotny.png',
+    id: 'prod-4',
+    name: 'Tiramisú',
+    description: 'Delicioso postre italiano con sabor a café.',
+    price: 6,
+    image_url: '/products/tiramisu.png',
   },
   {
-    id: 'CC27C14A-0ACF-4F4A-A6C9-D45682C144B9',
-    name: 'Amy Burns',
-    email: 'amy@burns.com',
-    image_url: '/customers/amy-burns.png',
-  },
-  {
-    id: '13D07535-C59E-4157-A011-F8D2EF4E0CBB',
-    name: 'Balazs Orban',
-    email: 'balazs@orban.com',
-    image_url: '/customers/balazs-orban.png',
+    id: 'prod-5',
+    name: 'Limonada',
+    description: 'Refrescante limonada hecha con limones frescos.',
+    price: 3,
+    image_url: '/products/lemonade.png',
   },
 ];
 
-const invoices = [
+const orders: Order[] = [
   {
-    customer_id: customers[0].id,
-    amount: 15795,
+    id: 'order-1',
+    user_id: users[0].id,
+    table_id: tables[0].id,
+    product_ids: [products[0].id, products[2].id],
     status: 'pending',
-    date: '2022-12-06',
+    date: '2024-10-24',
   },
   {
-    customer_id: customers[1].id,
-    amount: 20348,
-    status: 'pending',
-    date: '2022-11-14',
-  },
-  {
-    customer_id: customers[4].id,
-    amount: 3040,
-    status: 'paid',
-    date: '2022-10-29',
-  },
-  {
-    customer_id: customers[3].id,
-    amount: 44800,
-    status: 'paid',
-    date: '2023-09-10',
-  },
-  {
-    customer_id: customers[5].id,
-    amount: 34577,
-    status: 'pending',
-    date: '2023-08-05',
-  },
-  {
-    customer_id: customers[2].id,
-    amount: 54246,
-    status: 'pending',
-    date: '2023-07-16',
-  },
-  {
-    customer_id: customers[0].id,
-    amount: 666,
-    status: 'pending',
-    date: '2023-06-27',
-  },
-  {
-    customer_id: customers[3].id,
-    amount: 32545,
-    status: 'paid',
-    date: '2023-06-09',
-  },
-  {
-    customer_id: customers[4].id,
-    amount: 1250,
-    status: 'paid',
-    date: '2023-06-17',
-  },
-  {
-    customer_id: customers[5].id,
-    amount: 8546,
-    status: 'paid',
-    date: '2023-06-07',
-  },
-  {
-    customer_id: customers[1].id,
-    amount: 500,
-    status: 'paid',
-    date: '2023-08-19',
-  },
-  {
-    customer_id: customers[5].id,
-    amount: 8945,
-    status: 'paid',
-    date: '2023-06-03',
-  },
-  {
-    customer_id: customers[2].id,
-    amount: 1000,
-    status: 'paid',
-    date: '2022-06-05',
+    id: 'order-2',
+    user_id: users[0].id,
+    table_id: tables[1].id,
+    product_ids: [products[1].id, products[4].id],
+    status: 'completed',
+    date: '2024-10-24',
   },
 ];
 
-const revenue = [
-  { month: 'Jan', revenue: 2000 },
-  { month: 'Feb', revenue: 1800 },
-  { month: 'Mar', revenue: 2200 },
-  { month: 'Apr', revenue: 2500 },
-  { month: 'May', revenue: 2300 },
-  { month: 'Jun', revenue: 3200 },
-  { month: 'Jul', revenue: 3500 },
-  { month: 'Aug', revenue: 3700 },
-  { month: 'Sep', revenue: 2500 },
-  { month: 'Oct', revenue: 2800 },
-  { month: 'Nov', revenue: 3000 },
-  { month: 'Dec', revenue: 4800 },
+const accounts: Account[] = [
+  {
+    id: 'account-1',
+    order_id: orders[0].id,
+    total: 27, 
+    status: 'pending',
+    date: '2024-10-24',
+  },
+  {
+    id: 'account-2',
+    order_id: orders[1].id,
+    total: 11, 
+    status: 'paid',
+    date: '2024-10-24',
+  },
 ];
 
-export { users, customers, invoices, revenue };
+export {accounts, orders, products, tables, users};
