@@ -1,15 +1,12 @@
-import React from 'react'
-import { Metadata } from 'next';
+// app/accounts/page.tsx
 
-export const metadata: Metadata = {
-  title: 'Dashboard/Accounts',
-};
-function page() {
+import CardAccounts from "@/app/ui/accounts/CardAccounts";
+
+export default function AccountsPage() {
   return (
-    <div>
-      Accounts
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Cuentas</h1>
+      <CardAccounts />
     </div>
-  )
+  );
 }
-
-export default page

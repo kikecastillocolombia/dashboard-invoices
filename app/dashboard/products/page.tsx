@@ -1,5 +1,6 @@
 import React from 'react'
 import { Metadata } from 'next';
+import ProductsTable from '@/app/ui/products/ProductsTable';
 
 export const metadata: Metadata = {
   title: 'Dashboard/Products',
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
 function page() {
   return (
     <div>
-      Products
+      <ProductsTable/>
     </div>
   )
 }

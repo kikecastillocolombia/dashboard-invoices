@@ -83,12 +83,36 @@ export async function fetchCardDataTable() {
   }
 }
 
+export async function fetchTables() {
+  try {
+    const data = await sql<Table>`SELECT * FROM tables ORDER BY number ASC`;
+    return data.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch tables.');
+  }
+}
 
+export async function fetchCardDataUsers() {
+  try {
+    const userDataResult = await sql`
+      SELECT id, name, role FROM users ORDER BY name ASC
+    `;
 
+    const users = userDataResult.rows.map((row: QueryResultRow) => ({
+      id: row.id,
+      name: row.name,
+      role: row.role,
+    }));
 
-
-
-
+    return {
+      users,
+    };
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    throw error;
+  }
+}
 
 export async function fetchUsers() {
   try {
@@ -100,15 +124,17 @@ export async function fetchUsers() {
   }
 }
 
-export async function fetchTables() {
+// En un archivo de servicios o utils
+export async function fetchUserById(userId: string) {
   try {
-    const data = await sql<Table>`SELECT * FROM tables ORDER BY number ASC`;
-    return data.rows;
+    const data = await sql<User>`SELECT * FROM users WHERE id = ${userId}`;
+    return data.rows[0]; // Retorna el primer usuario encontrado
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch tables.');
+    throw new Error('Failed to fetch user by ID.');
   }
 }
+
 
 export async function fetchProducts() {
   try {
