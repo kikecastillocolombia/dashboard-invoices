@@ -1,18 +1,18 @@
 "use server"
 import { sql } from '@vercel/postgres';
 import { z } from 'zod';
-import { v4 as uuidv4 } from 'uuid';
 import {
   Order,
   Account,
 } from './definitions'; // Asegúrate de que este archivo incluya tus tipos
 
 // Define tu esquema de validación
+
 const OrderSchema = z.object({
   user_id: z.string().uuid(),
   table_id: z.string(),
   product_ids: z.array(z.object({
-    id: z.string(),
+    id: z.string().uuid(), // Asegúrate de que aquí sea uuid
     quantity: z.number().nonnegative(),
   })),
   status: z.enum(['pending', 'completed']),
@@ -31,23 +31,33 @@ export async function createOrder(orderData: unknown) {
 
   const { user_id, table_id, product_ids, status, date } = validatedFields.data;
 
-  const newId = uuidv4();
+  // Convierte los IDs de los productos a un arreglo de UUID
+  const productIdsArray = product_ids.map(product => product.id);
+
+  // Crear placeholders para cada ID de producto
+  const placeholders = productIdsArray.map((_, index) => `$${index + 3}`).join(', ');
 
   try {
-    const productIdsArray = product_ids.map((product: { id: string }) => product.id);
-
-    const result = await sql`
-      INSERT INTO orders (id, user_id, table_id, product_ids, status, date)
+    const query = `
+      INSERT INTO orders (user_id, table_id, product_ids, status, date)
       VALUES (
-        ${newId},
-        ${user_id},
-        ${table_id},
-        '${JSON.stringify(productIdsArray)}'::uuid[], 
-        ${status}, 
-        ${date}
+        $1, 
+        $2, 
+        ARRAY[${placeholders}]::uuid[], 
+        $${productIdsArray.length + 3}, 
+        $${productIdsArray.length + 4}
       )
       RETURNING *
     `;
+
+    // Ejecuta la consulta, asegurando que los IDs y el tipo de `date` son correctos
+    const result = await sql.query(query, [
+      user_id,
+      table_id,
+      ...productIdsArray, // Incluye los IDs como UUIDs
+      status,
+      date // Asegura que este valor sea un `timestamp`
+    ]);
 
     return {
       message: 'Order created successfully.',
@@ -60,6 +70,8 @@ export async function createOrder(orderData: unknown) {
     };
   }
 }
+
+
 
 export async function fetchOrders() {
   try {
@@ -165,3 +177,4 @@ export async function createAccount(account: Omit<Account, 'id'>) {
     throw new Error('Failed to create account.');
   }
 }
+ 
