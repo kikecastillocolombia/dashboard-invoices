@@ -1,6 +1,8 @@
+// /app/ui/tables/CardTables.tsx
 import { Squares2X2Icon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchCardDataTable } from '@/app/lib/data';
+import TableCard from './TableCard';
 
 const iconMap = {
   tables: Squares2X2Icon,
@@ -8,14 +10,14 @@ const iconMap = {
 
 // Definimos el tipo de mesa basado en la estructura de la tabla "tables"
 type Table = {
-  id: string;         // Identificador único para la mesa
-  number: number;     // Número de la mesa (ejemplo: Mesa 1, Mesa 2)
-  seats: number;      // Número de asientos en la mesa
-  status: 'Disponible' | 'Ocupada' | 'Reservada'; // Estado actual de la mesa
+  id: string;         
+  number: number;     
+  seats: number;      
+  status: 'Disponible' | 'Ocupada' | 'Reservada'; 
 };
 
 export default async function CardTables() {
-  const { totalTables, tables } = await fetchCardDataTable(); // Ajustar fetchCardDataTable para devolver `tables` también
+  const { totalTables, tables } = await fetchCardDataTable();
 
   return (
     <div>
@@ -30,17 +32,7 @@ export default async function CardTables() {
   );
 }
 
-// Componente para renderizar una mesa individual
-function TableCard({ table }: { table: Table }) {
-  return (
-    <div className="rounded-xl bg-gray-100 p-4 shadow-md">
-      <h3 className="text-lg font-semibold">Mesa {table.number}</h3>
-      <p className="text-sm text-gray-600">Capacidad: {table.seats}</p>
-      <p className="text-sm text-gray-600">Estado: {table.status}</p>
-    </div>
-  );
-}
-
+// Componente para mostrar el encabezado de la tarjeta
 export function Card({
   title,
   value,

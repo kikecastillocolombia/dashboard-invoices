@@ -1,62 +1,64 @@
-// app/lib/products.ts
+'use server';
+
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
+import { v4 as uuidv4 } from 'uuid';
 
+// Define the schema for product validation
 const ProductSchema = z.object({
-  name: z.string().min(1, "El nombre es obligatorio."),
+  name: z.string().min(1, { message: 'Product name is required.' }),
   description: z.string().optional(),
-  price: z.number().positive("El precio debe ser un número positivo."),
+  price: z.coerce
+    .number()
+    .gt(0, { message: 'Price must be greater than $0.' }),
 });
 
+// Define the type for the state
 export type State = {
   errors?: {
     name?: string[];
-    description?: string[];
     price?: string[];
   };
   message?: string | null;
 };
 
-export async function createProduct(prevState: State, formData: FormData) {
-  // Validar el formulario
-  const parsed = ProductSchema.safeParse({
+// Cambia la función createProduct para que acepte el estado y los datos del formulario
+export async function createProduct(state: State, formData: FormData) {
+  const validatedFields = ProductSchema.safeParse({
     name: formData.get('name'),
     description: formData.get('description'),
-    price: Number(formData.get('price')),
+    price: formData.get('price'),
   });
 
-  if (!parsed.success) {
+  // Verifica los datos validados
+  console.log('Validated Fields:', validatedFields);
+
+  if (!validatedFields.success) {
     return {
-      ...prevState,
-      errors: parsed.error.flatten().fieldErrors,
-      message: 'Errores en el formulario.',
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Product.',
     };
   }
 
-  const { name, description, price } = parsed.data;
+  const { name, description, price } = validatedFields.data;
 
-  console.log('Datos a insertar:', { name, description, price }); // Verificar los datos
+  const newId = uuidv4();
 
-  // Insertar el producto en la base de datos
   try {
     await sql`
-      INSERT INTO products (name, description, price)
-      VALUES (${name}, ${description}, ${price})
+      INSERT INTO products (id, name, description, price)
+      VALUES (${newId}, ${name}, ${description || null}, ${price})
     `;
-    return {
-      ...prevState,
-      message: 'Producto creado con éxito.',
-      errors: {},
-    };
   } catch (error) {
-    console.error('Error al insertar en la base de datos:', error); // Mostrar el error en la consola
+    console.error('Database Error:', error);
     return {
-      ...prevState,
-      message: 'Error al crear el producto: ' + (error instanceof Error ? error.message : error),
-      errors: {},
+      message: 'Database Error: Failed to Create Product.',
     };
   }
+
+  revalidatePath('/dashboard/products');
+  return { message: 'Product created successfully.' };
 }
 
 

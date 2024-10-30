@@ -25,14 +25,20 @@ export type Product = {
   image_url?: string;
 };
 
-export type Order = {
+// lib/definitions.ts
+
+export interface Order {
   id: string;
+  status: string;
+  date: string;
   user_id: string;
   table_id: string;
-  product_ids: string[];
-  status: 'pending' | 'completed';
-  date: string;
-};
+  table_number: string;
+  product_names: string[];
+}
+
+
+
 
 export type Account = {
   id: string;

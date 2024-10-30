@@ -85,8 +85,8 @@ export async function fetchCardDataTable() {
 
 export async function fetchTables() {
   try {
-    const data = await sql<Table>`SELECT * FROM tables ORDER BY number ASC`;
-    return data.rows;
+    const data = await sql<Table>`SELECT id, number, seats, status FROM tables ORDER BY number ASC`;
+    return data.rows; // Devuelve la lista de mesas
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch tables.');
@@ -116,8 +116,8 @@ export async function fetchCardDataUsers() {
 
 export async function fetchUsers() {
   try {
-    const data = await sql<User>`SELECT * FROM users ORDER BY name ASC`;
-    return data.rows;
+    const data = await sql<User>`SELECT id, name, role FROM users ORDER BY name ASC`;
+    return data.rows; // Devuelve la lista de usuarios
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch users.');
@@ -138,23 +138,49 @@ export async function fetchUserById(userId: string) {
 
 export async function fetchProducts() {
   try {
-    const data = await sql<Product>`SELECT * FROM products ORDER BY name ASC`;
-    return data.rows;
+    const data = await sql<Product>`SELECT id, name FROM products ORDER BY name ASC`;
+    return data.rows; // Devuelve la lista de productos
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch products.');
   }
 }
 
-export async function fetchOrders() {
+export async function fetchOrders(): Promise<Order[]> {
   try {
-    const data = await sql<Order>`SELECT * FROM orders ORDER BY date DESC`;
-    return data.rows;
+    const data = await sql`
+      SELECT 
+        orders.id,
+        orders.status,
+        orders.date,
+        orders.user_id,
+        orders.table_id,
+        tables.number AS table_number,
+        array_agg(products.name) AS product_names
+      FROM orders
+      JOIN tables ON orders.table_id = tables.id
+      JOIN LATERAL unnest(orders.product_ids) AS product_id ON true
+      JOIN products ON products.id = product_id
+      GROUP BY orders.id, tables.number
+      ORDER BY orders.date DESC;
+    `;
+
+    // Mapeo de filas a la estructura de Order
+    return data.rows.map((row: QueryResultRow) => ({
+      id: row.id,
+      status: row.status,
+      date: row.date,
+      user_id: row.user_id,
+      table_id: row.table_id,
+      table_number: row.table_number, // Asignando el número de mesa
+      product_names: row.product_names || [],
+    }));
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch orders.');
   }
 }
+
 
 export async function fetchAccounts() {
   try {

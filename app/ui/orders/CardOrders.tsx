@@ -28,7 +28,7 @@ export default async function CardOrders() {
 
   return (
     <div>
-      <Card title="Órdenes" value={orders.length} type="orders" />
+      <Card title="Órdenes" value={orders.length} type="Orders" />
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Renderizamos todas las órdenes */}
         {orders.map((order: Order) => (
@@ -45,20 +45,20 @@ function OrderCard({ order, userName }: { order: Order; userName: string }) {
     <div className="rounded-xl bg-gray-100 p-4 shadow-md">
       <p className="text-sm font-semibold">Estado: {order.status}</p>
       <p className="text-sm text-gray-600">Fecha: {new Date(order.date).toLocaleDateString()}</p>
-      <p className="text-sm text-gray-600">Mesa: {order.table_id}</p>
+      <p className="text-sm text-gray-600">Mesa: {order.table_number}</p> {/* Mostrar número de mesa */}
       <p className="text-sm text-gray-600">Usuario: {userName || 'Desconocido'}</p>
       <p className="text-sm text-gray-600">
-        Productos: {order.product_ids.join(', ') || 'Sin productos'}
+        Productos: {order.product_names.join(', ') || 'Sin productos'} {/* Mostrar nombres de productos */}
       </p>
     </div>
   );
 }
 
+
 // Card para mostrar el título y el conteo de órdenes
 export function Card({
   title,
   value,
-  type,
 }: {
   title: string;
   value: number | string;

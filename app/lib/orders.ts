@@ -1,8 +1,65 @@
+"use server"
 import { sql } from '@vercel/postgres';
+import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 import {
   Order,
   Account,
 } from './definitions'; // Asegúrate de que este archivo incluya tus tipos
+
+// Define tu esquema de validación
+const OrderSchema = z.object({
+  user_id: z.string().uuid(),
+  table_id: z.string(),
+  product_ids: z.array(z.object({
+    id: z.string(),
+    quantity: z.number().nonnegative(),
+  })),
+  status: z.enum(['pending', 'completed']),
+  date: z.string(),
+});
+
+export async function createOrder(orderData: unknown) {
+  const validatedFields = OrderSchema.safeParse(orderData);
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Order.',
+    };
+  }
+
+  const { user_id, table_id, product_ids, status, date } = validatedFields.data;
+
+  const newId = uuidv4();
+
+  try {
+    const productIdsArray = product_ids.map((product: { id: string }) => product.id);
+
+    const result = await sql`
+      INSERT INTO orders (id, user_id, table_id, product_ids, status, date)
+      VALUES (
+        ${newId},
+        ${user_id},
+        ${table_id},
+        '${JSON.stringify(productIdsArray)}'::uuid[], 
+        ${status}, 
+        ${date}
+      )
+      RETURNING *
+    `;
+
+    return {
+      message: 'Order created successfully.',
+      order: result.rows[0],
+    };
+  } catch (error) {
+    console.error('Database Error:', error);
+    return {
+      message: 'Database Error: Failed to Create Order.',
+    };
+  }
+}
 
 export async function fetchOrders() {
   try {
@@ -26,22 +83,16 @@ export async function fetchOrderById(id: string) {
   }
 }
 
-export async function createOrder(order: Omit<Order, 'id'>) {
-    try {
-      const { user_id, table_id, product_ids, status, date } = order;
-  
-      // Convertir product_ids a formato JSON
-      const result = await sql<Order>`
-        INSERT INTO orders (user_id, table_id, product_ids, status, date)
-        VALUES (${user_id}, ${table_id}, ${JSON.stringify(product_ids)}, ${status}, ${date})
-        RETURNING *
-      `;
-      return result.rows[0]; // Retorna el nuevo pedido creado
-    } catch (error) {
-      console.error('Database Error:', error);
-      throw new Error('Failed to create order.');
-    }
-  }
+
+export type State = {
+  message: string | null;
+  errors: {
+    table_id?: string[];
+    product_ids?: string[];
+    quantity?: string[];
+  };
+};
+
   
   // Función para actualizar un pedido
   export async function updateOrder(id: string, updatedFields: Partial<Omit<Order, 'id'>>) {
